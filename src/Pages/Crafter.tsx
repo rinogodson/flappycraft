@@ -27,7 +27,9 @@ function Craft() {
       <div className="w-full h-full bg-black sm:w-150 sm:h-200 relative overflow-hidden sm:border-20 sm:border-b-0 sm:border-[#E66100] sm:shadow-[inset_0_0_0px_4px_#542B01,0_0_0_3px_black]">
         <div className="w-full h-[calc(100%-4rem)] p-5  font-jersey overflow-y-scroll">
           <BirdSprite />
+          <div className="h-40 w-full "></div>
         </div>
+        <div className="bg-[#572D01] h-20 w-[calc(100%-2rem)] absolute bottom-20 translate-x-[50%] right-[50%] shadow-[0_0_0_10px_rgba(0,0,0,0.5)]"></div>
         <div className="grid grid-cols-[4rem_1fr_4rem]  text-white font-jersey w-full h-16 bg-[#E66100] absolute bottom-0 sm:shadow-[0_-2px_0_2px_#542B01] shadow-[0_-2px_0_2px_white,0_-4px_0_4px_#542B01]">
           <div className="w-full h-full flex justify-center items-center active:scale-95 active:brightness-90">
             <img src="/leftar.svg" />

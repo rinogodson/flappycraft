@@ -16,7 +16,7 @@ const schemaAndData: {
   birdSprite: { normal: [], death: undefined },
   pipeSprite: { sprite: undefined, fillType: "Stretch" },
   bg: {
-    bgImg: { sprite: undefined, fillType: "Stretch" },
+    bgImg: { sprite: undefined, fillType: "Cover" },
     baseImg: { sprite: undefined, fillType: "Stretch" },
   },
   sounds: {
