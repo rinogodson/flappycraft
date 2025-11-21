@@ -1,4 +1,4 @@
-const schema: {
+const schemaAndData: {
   birdSprite: { normal: [File?, File?, File?]; death: File | undefined };
   pipeSprite: { sprite: File | undefined; fillType: "Stretch" | "Cover" };
   bg: {
@@ -11,6 +11,7 @@ const schema: {
     bgMusic: { file: File | undefined; volume: number };
     point: File | undefined;
   };
+  name: string;
 } = {
   birdSprite: { normal: [], death: undefined },
   pipeSprite: { sprite: undefined, fillType: "Stretch" },
@@ -24,6 +25,7 @@ const schema: {
     bgMusic: { file: undefined, volume: 50 },
     point: undefined,
   },
+  name: "",
 };
 
-export default schema;
+export default schemaAndData;

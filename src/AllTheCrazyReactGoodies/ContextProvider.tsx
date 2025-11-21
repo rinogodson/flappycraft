@@ -5,19 +5,17 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
+import schemaAndData from "./ctxSchema";
 
-const EditorCtx = createContext<{
-  eCtx: null;
-  setECtx: Dispatch<SetStateAction<null>>;
-}>(
-  {} as {
-    eCtx: null;
-    setECtx: Dispatch<SetStateAction<null>>;
-  },
-);
+type schemaType = {
+  eCtx: typeof schemaAndData;
+  setECtx: Dispatch<SetStateAction<typeof schemaAndData>>;
+};
+
+const EditorCtx = createContext<schemaType>({} as schemaType);
 
 export const EditorCtxProvider = ({ children }: { children: ReactElement }) => {
-  const [eCtx, setECtx] = useState(null);
+  const [eCtx, setECtx] = useState(schemaAndData);
 
   return (
     <EditorCtx.Provider value={{ eCtx, setECtx }}>
