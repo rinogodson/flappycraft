@@ -114,6 +114,14 @@ function Game() {
     const BASE_HEIGHT = 120;
     const BASE_TOP_COORDS = canvas.height - BASE_HEIGHT;
 
+    const button = {
+      x: canvas.width / 2 - 220 / 2,
+      y: canvas.height / 2 + 60,
+      width: 220,
+      height: 60,
+      text: "Play Again",
+    };
+
     const update = (time: number) => {
       requestAnimationFrame(update);
       context.lineWidth = 1;
@@ -392,6 +400,32 @@ function Game() {
         context.fillStyle = `rgba(0, 0, 0, ${fadeOp.current})`;
         context.fillRect(0, 0, canvas.width, canvas.height);
       }
+
+      //Drawing the button to restart the game <-- also by me, not AI!!
+      if (gameOverRef.current) {
+        context.save();
+        context.lineWidth = 10;
+        context.fillStyle = "green";
+        context.strokeStyle = "black";
+        context.strokeRect(button.x, button.y, button.width, button.height);
+
+        context.lineWidth = 3;
+        context.strokeStyle = "white";
+        context.fillRect(button.x, button.y, button.width, button.height);
+
+        context.strokeRect(button.x, button.y, button.width, button.height);
+
+        context.font = `48px "Jersey 10"`;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillStyle = "white";
+        context.fillText(
+          button.text,
+          button.x + button.width / 2,
+          button.y + button.height / 2,
+        );
+        context.restore();
+      }
     };
 
     const resetGame = () => {
@@ -454,22 +488,44 @@ function Game() {
       if (fadeState.current !== 0) return;
       if (e.type === "keydown") {
         if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
-          if (gameOverRef.current) {
-            fadeState.current = 1;
-          } else {
+          if (!gameOverRef.current) {
             if (!gameStarted.current) {
               gameStarted.current = true;
               startTime.current = Date.now();
             }
             jump(false);
           }
+        } else if (e.code == "Enter") {
+          fadeState.current = 1;
         }
       }
 
-      if (e.type === "touchstart") {
-        e.preventDefault();
+      if (e.type === "touchstart" || e.type === "mousedown") {
+        if (e.type === "touchstart") {
+          e.preventDefault();
+        }
+
         if (gameOverRef.current) {
-          fadeState.current = 1;
+          const rect = canvas.getBoundingClientRect();
+          const clientX =
+            e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+          const clientY =
+            e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+
+          const clickX = (clientX - rect.left) * scaleX;
+          const clickY = (clientY - rect.top) * scaleY;
+
+          if (
+            clickX >= button.x &&
+            clickX <= button.x + button.width &&
+            clickY >= button.y &&
+            clickY <= button.y + button.height
+          ) {
+            fadeState.current = 1;
+          }
         } else {
           if (!gameStarted.current) {
             gameStarted.current = true;
@@ -482,6 +538,7 @@ function Game() {
 
     document.addEventListener("keydown", handler);
     document.addEventListener("touchstart", handler, { passive: false });
+    document.addEventListener("mousedown", handler, { passive: false });
 
     type h = {
       x: number;
