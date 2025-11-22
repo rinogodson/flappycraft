@@ -102,8 +102,9 @@ function Game() {
       return img;
     });
     let frameTick = 0;
+    let animDir = 1;
     let currentFrame = 0;
-    const FRAME_SPEED = 6;
+    const FRAME_SPEED = 12;
 
     const baseImg = new Image();
     baseImg.src = dumData.bg.baseImg.sprite;
@@ -181,37 +182,6 @@ function Game() {
       }
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      //DRAWING THE FREAKING BIRD
-      context.save();
-
-      const bW = birdProps.current.w;
-      const bH = (birdProps.current.w * 3) / 4;
-      const pivotX = bW / 2;
-      const pivotY = bH / 2;
-
-      context.translate(
-        birdProps.current.x + pivotX,
-        birdProps.current.y + pivotY,
-      );
-
-      context.rotate(birdProps.current.rotation);
-      if (!gameOverRef.current) {
-        frameTick++;
-        if (frameTick % FRAME_SPEED === 0) {
-          currentFrame = (currentFrame + 1) % birdImages.length;
-        }
-      }
-      context.drawImage(birdImages[currentFrame], -pivotX, -pivotY, bW, bH);
-
-      context.restore();
-
-      // context.strokeRect(
-      //   birdProps.current.x + 5,
-      //   birdProps.current.y + 5,
-      //   birdProps.current.w - 10,
-      //   (birdProps.current.w * 3) / 4 - 10,
-      // );
-
       const pipeArray = pipeProps.current.pArray;
 
       for (let i = 0; i < pipeArray.length; i++) {
@@ -283,6 +253,53 @@ function Game() {
           placePipes();
         }
       }
+
+      //DRAWING THE FREAKING BIRD
+      context.save();
+
+      const bW = birdProps.current.w;
+      const bH = (birdProps.current.w * 3) / 4;
+      const pivotX = bW / 2;
+      const pivotY = bH / 2;
+
+      context.translate(
+        birdProps.current.x + pivotX,
+        birdProps.current.y + pivotY,
+      );
+
+      context.rotate(birdProps.current.rotation);
+      if (!gameOverRef.current) {
+        frameTick++;
+        if (frameTick % FRAME_SPEED === 0) {
+          currentFrame += animDir;
+          if (currentFrame >= birdImages.length) {
+            currentFrame = birdImages.length - 2;
+            animDir = -1;
+          } else if (currentFrame < 0) {
+            currentFrame = 1;
+            animDir = 1;
+          }
+        }
+      }
+      const deathImage = new Image();
+      deathImage.src = dumData.birdSprite.death;
+
+      context.drawImage(
+        gameOverRef.current ? deathImage : birdImages[currentFrame],
+        -pivotX,
+        -pivotY,
+        bW,
+        bH,
+      );
+
+      context.restore();
+
+      // context.strokeRect(
+      //   birdProps.current.x + 5,
+      //   birdProps.current.y + 5,
+      //   birdProps.current.w - 10,
+      //   (birdProps.current.w * 3) / 4 - 10,
+      // );
 
       baseX += physics.current.velocityX * delta;
       if (baseX <= -canvas.width) baseX = 0;
