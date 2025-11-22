@@ -60,6 +60,11 @@ function Game() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setGO] = useState(false);
   const gameOverRef = useRef(false);
+  const gameStarted = useRef(false);
+  const startTime = useRef(0);
+  const flashOp = useRef(0);
+  const fadeOp = useRef(0);
+  const fadeState = useRef(0);
 
   const defPhysics = {
     velocityX: -3,
@@ -116,41 +121,67 @@ function Game() {
         birdProps.current.y + 5 + ((birdProps.current.w - 10) * 3) / 4 >=
         canvas.height - BASE_HEIGHT;
 
-      if (floorCollision) {
+      if (floorCollision && !gameOverRef.current) {
         gameOverRef.current = true;
         setGO(true);
+        flashOp.current = 1;
+      }
+
+      if (fadeState.current === 1) {
+        fadeOp.current += 0.04;
+        if (fadeOp.current >= 1) {
+          fadeOp.current = 1;
+          resetGame();
+          fadeState.current = 2;
+        }
+      } else if (fadeState.current === 2) {
+        fadeOp.current -= 0.04;
+        if (fadeOp.current <= 0) {
+          fadeOp.current = 0;
+          fadeState.current = 0;
+        }
+      }
+
+      if (flashOp.current > 0) {
+        flashOp.current -= 0.05;
       }
 
       const delta = (time - lastTime) / 16.666;
 
-      if (physics.current.velocityY < 1.5) {
-        birdProps.current.rotation = -25 * (Math.PI / 180);
+      if (!gameStarted.current) {
+        birdProps.current.y = canvas.height / 2 + Math.sin(time / 200) * 10;
+        birdProps.current.rotation = 0;
       } else {
-        birdProps.current.rotation += 0.05 * delta;
-        const degree90 = 90 * (Math.PI / 180);
+        if (physics.current.velocityY < 1.5) {
+          birdProps.current.rotation = -25 * (Math.PI / 180);
+        } else {
+          birdProps.current.rotation += 0.05 * delta;
+          const degree90 = 90 * (Math.PI / 180);
 
-        if (birdProps.current.rotation > degree90) {
-          birdProps.current.rotation = degree90;
+          if (birdProps.current.rotation > degree90) {
+            birdProps.current.rotation = degree90;
+          }
         }
+
+        physics.current.velocityY += physics.current.gravity * delta;
+        birdProps.current.y += physics.current.velocityY * delta;
+        if (physics.current.velocityY > TERMINAL_VELOCITY) {
+          physics.current.velocityY = TERMINAL_VELOCITY;
+        }
+
+        birdProps.current.y = Math.max(
+          birdProps.current.y + physics.current.velocityY,
+          0,
+        );
       }
       lastTime = time;
-
-      physics.current.velocityY += physics.current.gravity * delta;
-      birdProps.current.y += physics.current.velocityY * delta;
-      if (physics.current.velocityY > TERMINAL_VELOCITY) {
-        physics.current.velocityY = TERMINAL_VELOCITY;
-      }
-
-      birdProps.current.y = Math.max(
-        birdProps.current.y + physics.current.velocityY,
-        0,
-      );
 
       if (birdProps.current.y > BASE_TOP_COORDS) {
         birdProps.current.y = BASE_TOP_COORDS;
       }
       context.clearRect(0, 0, canvas.width, canvas.height);
 
+      //DRAWING THE FREAKING BIRD
       context.save();
 
       const bW = birdProps.current.w;
@@ -174,12 +205,12 @@ function Game() {
 
       context.restore();
 
-      context.strokeRect(
-        birdProps.current.x + 5,
-        birdProps.current.y + 5,
-        birdProps.current.w - 10,
-        (birdProps.current.w * 3) / 4 - 10,
-      );
+      // context.strokeRect(
+      //   birdProps.current.x + 5,
+      //   birdProps.current.y + 5,
+      //   birdProps.current.w - 10,
+      //   (birdProps.current.w * 3) / 4 - 10,
+      // );
 
       const pipeArray = pipeProps.current.pArray;
 
@@ -231,14 +262,15 @@ function Game() {
           ) {
             gameOverRef.current = true;
             setGO(true);
+            flashOp.current = 1;
           }
         }
-        context.strokeRect(
-          pipe.x - 5,
-          pipe.y - 5,
-          pipe.width + 10,
-          pipe.height + 10,
-        );
+        // context.strokeRect(
+        //   pipe.x - 5,
+        //   pipe.y - 5,
+        //   pipe.width + 10,
+        //   pipe.height + 10,
+        // );
       }
 
       pipeProps.current.pArray = pipeProps.current.pArray.filter(
@@ -246,8 +278,10 @@ function Game() {
       );
 
       const lastPipe = pipeArray[pipeArray.length - 1];
-      if (!lastPipe || lastPipe.x < canvas.width - PIPE_SPACING) {
-        placePipes();
+      if (gameStarted.current && Date.now() - startTime.current > 3000) {
+        if (!lastPipe || lastPipe.x < canvas.width - PIPE_SPACING) {
+          placePipes();
+        }
       }
 
       baseX += physics.current.velocityX * delta;
@@ -269,34 +303,58 @@ function Game() {
       );
 
       //THE SCORE DISPLAY!! <-- This is not AI made comment, it's by me Rino Godson! and this entore code is made by me
-      context.fillStyle = "white";
-      context.font = '80px "Jersey 10"';
-      context.strokeStyle = "black";
-      context.lineWidth = 10;
-
-      context.strokeText(
-        score.current.toString().padStart(2, "0"),
-        canvas.width / 2,
-        150,
-      );
-      context.fillText(
-        score.current.toString().padStart(2, "0"),
-        canvas.width / 2,
-        150,
-      );
+      if (gameStarted.current) {
+        context.fillStyle = "white";
+        context.font = gameOverRef.current
+          ? '100px "Jersey 10"'
+          : '80px "Jersey 10"';
+        context.strokeStyle = "black";
+        context.lineWidth = gameOverRef.current ? 15 : 10;
+        context.strokeText(
+          score.current.toString().padStart(2, "0"),
+          canvas.width / 2,
+          gameOverRef.current ? 200 : 150,
+        );
+        context.fillText(
+          score.current.toString().padStart(2, "0"),
+          canvas.width / 2,
+          gameOverRef.current ? 200 : 150,
+        );
+        if (gameOverRef.current) {
+          context.font = '80px "Jersey 10"';
+          context.strokeText("GAME OVER", canvas.width / 2, 280);
+          context.fillText("GAME OVER", canvas.width / 2, 280);
+        }
+      } else if (!gameStarted.current) {
+        context.fillStyle = "white";
+        context.font = '80px "Jersey 10"';
+        context.strokeStyle = "black";
+        context.lineWidth = 10;
+        context.strokeText("Get Ready!", canvas.width / 2, 150);
+        context.fillText("Get Ready!", canvas.width / 2, 150);
+      }
       context.textAlign = "center";
 
       if (gameOverRef.current) {
         physics.current.gravity = 5;
         physics.current.velocityX = 0;
       }
+
+      if (flashOp.current > 0) {
+        context.fillStyle = `rgba(255, 255, 255, ${flashOp.current})`;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      if (fadeOp.current > 0) {
+        context.fillStyle = `rgba(0, 0, 0, ${fadeOp.current})`;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
     };
 
     const resetGame = () => {
-      if (!gameOverRef.current) return;
-
       gameOverRef.current = false;
       setGO(false);
+      gameStarted.current = false;
+      flashOp.current = 0;
 
       birdProps.current = { ...defBirdProps };
       birdProps.current.x = canvas.width / 8;
@@ -349,11 +407,16 @@ function Game() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handler = (e: any) => {
+      if (fadeState.current !== 0) return;
       if (e.type === "keydown") {
         if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
           if (gameOverRef.current) {
-            resetGame();
+            fadeState.current = 1;
           } else {
+            if (!gameStarted.current) {
+              gameStarted.current = true;
+              startTime.current = Date.now();
+            }
             jump(false);
           }
         }
@@ -362,9 +425,13 @@ function Game() {
       if (e.type === "touchstart") {
         e.preventDefault();
         if (gameOverRef.current) {
-          resetGame();
+          fadeState.current = 1;
         } else {
-          jump(false);
+          if (!gameStarted.current) {
+            gameStarted.current = true;
+            startTime.current = Date.now();
+          }
+          jump(true);
         }
       }
     };
