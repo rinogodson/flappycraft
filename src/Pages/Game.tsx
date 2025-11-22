@@ -320,18 +320,32 @@ function Game() {
       );
 
       //THE SCORE DISPLAY!! <-- This is not AI made comment, it's by me Rino Godson! and this entore code is made by me
+      context.lineJoin = "miter";
+
       if (gameStarted.current) {
-        context.fillStyle = "white";
         context.font = gameOverRef.current
           ? '100px "Jersey 10"'
           : '80px "Jersey 10"';
         context.strokeStyle = "black";
-        context.lineWidth = gameOverRef.current ? 15 : 10;
+        context.lineWidth = gameOverRef.current ? 10 : 8;
         context.strokeText(
           score.current.toString().padStart(2, "0"),
           canvas.width / 2,
           gameOverRef.current ? 200 : 150,
         );
+
+        context.fillStyle = "black";
+        context.fillText(
+          score.current.toString().padStart(2, "0"),
+          canvas.width / 2 + 5,
+          gameOverRef.current ? 200 + 3 : 150 + 3,
+        );
+        context.strokeText(
+          score.current.toString().padStart(2, "0"),
+          canvas.width / 2 + 3,
+          gameOverRef.current ? 200 + 3 : 150 + 3,
+        );
+        context.fillStyle = "white";
         context.fillText(
           score.current.toString().padStart(2, "0"),
           canvas.width / 2,
@@ -343,12 +357,25 @@ function Game() {
           context.fillText("GAME OVER", canvas.width / 2, 280);
         }
       } else if (!gameStarted.current) {
-        context.fillStyle = "white";
+        const pos = 150;
+        const shift = 0;
+
         context.font = '80px "Jersey 10"';
+        context.fillStyle = "black";
+
+        context.lineWidth = 7;
         context.strokeStyle = "black";
-        context.lineWidth = 10;
-        context.strokeText("Get Ready!", canvas.width / 2, 150);
-        context.fillText("Get Ready!", canvas.width / 2, 150);
+        context.strokeText("Get Ready!", canvas.width / 2 + 3, pos + shift + 3);
+
+        context.fillText("Get Ready!", canvas.width / 2 + 3, pos + shift + 3);
+
+        context.fillStyle = "green";
+
+        context.lineWidth = 7;
+        context.strokeStyle = "white";
+        context.strokeText("Get Ready!", canvas.width / 2, pos + shift);
+
+        context.fillText("Get Ready!", canvas.width / 2, pos + shift);
       }
       context.textAlign = "center";
 

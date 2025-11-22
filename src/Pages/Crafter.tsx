@@ -30,7 +30,7 @@ function Craft() {
         </div>
         <div className="bg-[#572D01] h-20 w-[calc(100%-2rem)] absolute bottom-20 translate-x-[50%] right-[50%] shadow-[0_0_0_10px_rgba(0,0,0,0.5)]"></div>
         <div className="grid grid-cols-[4rem_1fr_4rem]  text-white font-jersey w-full h-16 bg-[#E66100] absolute bottom-0 sm:shadow-[0_-2px_0_2px_#542B01] shadow-[0_-2px_0_2px_white,0_-4px_0_4px_#542B01]">
-          <div className="w-full h-full flex justify-center items-center active:scale-95 active:brightness-90">
+          <div className="w-full origin-left h-full flex justify-center items-center active:scale-95 active:brightness-90">
             <img src="/leftar.svg" />
           </div>
           <div className="text-shadow-[0_2px_0px_rgba(0,0,0,0.25)]  w-full flex justify-center items-center flex-col text-3xl">
@@ -44,7 +44,7 @@ function Craft() {
               })}
             </div>
           </div>
-          <div className="w-full h-full flex justify-center items-center active:scale-95 active:brightness-90">
+          <div className="w-full h-full origin-right flex justify-center items-center active:scale-95 active:brightness-90">
             <img src="/rightar.svg" />
           </div>
         </div>
