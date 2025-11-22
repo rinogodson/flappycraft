@@ -92,9 +92,12 @@ const BirdSprite = () => {
           <div className="h-full aspect-square bg-black border border-white text-white flex justify-center items-center">
             None
           </div>
-          <div className="h-full w-full flex justify-center items-center">
-            <p className="w-full text-center text-4xl sm:text-4xl text-white/50">
+          <div className="h-full px-5 w-full flex flex-col justify-center items-center">
+            <p className="w-full text-center text-2xl sm:text-4xl text-white/50">
               Frame 2 Selected
+            </p>
+            <p className="w-full text-center text-xl sm:text-2xl text-white/50">
+              Please Select a Square or 4:3 image
             </p>
           </div>
         </div>
@@ -105,9 +108,12 @@ const BirdSprite = () => {
           <div className="h-full aspect-square bg-black border border-white text-white flex justify-center items-center">
             None
           </div>
-          <div className="h-full w-full flex justify-center items-center">
-            <p className="w-full text-center text-4xl sm:text-4xl text-white/50">
+          <div className="h-full px-5 w-full flex flex-col justify-center items-center">
+            <p className="w-full text-center text-2xl sm:text-4xl text-white/50">
               On Death Sprite
+            </p>
+            <p className="w-full text-center text-xl sm:text-2xl text-white/50">
+              Please Select a Square or 4:3 image
             </p>
           </div>
         </div>
