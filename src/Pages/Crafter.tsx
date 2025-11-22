@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import Btn from "../Components/Btn";
 import Button from "../Components/Crafter/Button";
 
 function Craft() {
