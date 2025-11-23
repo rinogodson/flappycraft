@@ -400,12 +400,12 @@ function Game() {
 
       context.restore();
 
-      context.strokeRect(
-        birdProps.current.x + 5,
-        birdProps.current.y + 5,
-        birdProps.current.w - 10,
-        bH - 10,
-      );
+      // context.strokeRect(
+      //   birdProps.current.x + 5,
+      //   birdProps.current.y + 5,
+      //   birdProps.current.w - 10,
+      //   bH - 10,
+      // );
 
       baseX += physics.current.velocityX * delta;
       if (baseX <= -canvas.width) baseX = 0;
