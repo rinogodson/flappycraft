@@ -11,6 +11,12 @@ Save the files using `ctrl/cmd + s` and use them.
 - **[ZachTheBird](https://raw.githubusercontent.com/rinogodson/flappycraft/refs/heads/main/demofiles/zachthebird.flap) - Let's remember the issues with the Slack team... (We were at their gunpoint)**
 - **[MuskyBird](https://raw.githubusercontent.com/rinogodson/flappycraft/refs/heads/main/demofiles/muskybird.flap) - Richest bird!!**
 
+## Controls:
+### Desktop:
+- Space/W/UpArrow to Flap
+- Enter to Restart
+### Mobile:
+- Touch to Jump
 
 ## Usage:
 ### You can create your own Flappy Bird by creating a JSON file with this schema and then uploading it to the app.
@@ -54,12 +60,7 @@ Save the files using `ctrl/cmd + s` and use them.
   "name": "<name_of_the_game_maximum_25_chars>" // name of the game
 }
 ```
-## Controls:
-### Desktop:
-- Space/W/UpArrow to Flap
-- Enter to Restart
-### Mobile:
-- Touch to Jump
+
 ---
 ## 🤝 Contributing  
 Contributions are welcome! Please fork the repository and submit a pull request.  
