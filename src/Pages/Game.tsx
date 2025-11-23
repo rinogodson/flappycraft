@@ -1,14 +1,60 @@
-import { useEffect, useRef, useState } from "react";
-import * as dumData from "./dunData.json";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import FlappyCtx from "../AllTheCrazyReactGoodies/ContextProvider";
+import { useDropzone } from "react-dropzone";
 function Game() {
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [showDialog, setShowDialog] = useState(true);
+
+  const c = useContext(FlappyCtx);
+
+  const onDrop = useCallback(
+    (files: File[]) => {
+      if (files.length > 1) return;
+      if (!files[0].name.match(/.*\.flap/) && !files[0].name.match(/.*\.json/))
+        return;
+      const file = files[0];
+
+      const r = new FileReader();
+      r.onload = (e) => {
+        try {
+          const text = e.target?.result;
+          if (typeof text !== "string") return;
+
+          const parsed = JSON.parse(text);
+          c.setGameCtx(parsed);
+          console.log("Parsed JSON:", parsed);
+          console.log(c.gameCtx);
+        } catch (err) {
+          console.error("Invalid JSON:", err);
+        }
+      };
+      r.onerror = () => {
+        console.error("Error reading file");
+      };
+
+      r.readAsText(file);
+    },
+    [c],
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   useEffect(() => {
-    const bg = new Audio(dumData.sounds.bgMusic.file);
-    bg.volume = dumData.sounds.bgMusic.volume / 100;
+    if (c.gameCtx.name == "") {
+      setShowDialog(true);
+    } else {
+      setShowDialog(false);
+    }
+    const bg = new Audio(c.gameCtx.sounds.bgMusic.file);
+    bg.volume = c.gameCtx.sounds.bgMusic.volume / 100;
     bg.loop = true;
     bgMusicRef.current = bg;
-  }, []);
+  }, [
+    c.gameCtx.name,
+    c.gameCtx.sounds.bgMusic.file,
+    c.gameCtx.sounds.bgMusic.volume,
+  ]);
 
   const play = (sound: string, volume: number, loop: boolean = false) => {
     const audio = new Audio(sound);
@@ -31,12 +77,12 @@ function Game() {
   }
 
   useEffect(() => {
-    document.body.style.backgroundColor = dumData.bg.baseColor;
-    setThemeColor(dumData.bg.bgColor);
+    document.body.style.backgroundColor = c.gameCtx.bg.baseColor;
+    setThemeColor(c.gameCtx.bg.bgColor);
     return () => {
       document.body.style.backgroundColor = "";
     };
-  }, []);
+  }, [c.gameCtx.bg.baseColor, c.gameCtx.bg.bgColor]);
 
   //types!!
   type pipe = {
@@ -110,22 +156,24 @@ function Game() {
     context.imageSmoothingEnabled = false;
 
     const topPipe = new Image();
-    topPipe.src = dumData.pipeSprite.sprite;
+    topPipe.src = String(c.gameCtx.pipeSprite.sprite);
     const botPipe = new Image();
-    botPipe.src = dumData.pipeSprite.sprite;
+    botPipe.src = String(c.gameCtx.pipeSprite.sprite);
 
-    const birdImages = dumData.birdSprite.normal.map((src: string) => {
-      const img = new Image();
-      img.src = src;
-      return img;
-    });
+    const birdImages = c.gameCtx.birdSprite.normal.map(
+      (src: string | undefined) => {
+        const img = new Image();
+        img.src = String(src);
+        return img;
+      },
+    );
     let frameTick = 0;
     let animDir = 1;
     let currentFrame = 0;
     const FRAME_SPEED = 12;
 
     const baseImg = new Image();
-    baseImg.src = dumData.bg.baseImg.sprite;
+    baseImg.src = String(c.gameCtx.bg.baseImg.sprite);
 
     let lastTime = performance.now();
     let baseX = 0;
@@ -154,7 +202,7 @@ function Game() {
         gameOverRef.current = true;
         setGO(true);
         flashOp.current = 1;
-        play(dumData.sounds.death, 0.5, false);
+        play(String(c.gameCtx.sounds.death), 0.5, false);
         bgMusicRef.current?.pause();
       }
 
@@ -208,13 +256,13 @@ function Game() {
         birdProps.current.y = BASE_TOP_COORDS;
       }
       context.clearRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = `rgba(0,0,0,${dumData.bg.opacity})`;
+      context.fillStyle = `rgba(0,0,0,${c.gameCtx.bg.opacity})`;
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.font = `25px "Jersey 10"`;
       context.textAlign = "left";
       context.textBaseline = "top";
       context.fillStyle = "white";
-      context.fillText(dumData.name, 10, 10);
+      context.fillText(c.gameCtx.name, 10, 10);
 
       const pipeArray = pipeProps.current.pArray;
 
@@ -246,7 +294,7 @@ function Game() {
         if (!pipe.passed && birdProps.current.x > pipe.x && pipe.isTop) {
           score.current += 1;
           pipe.passed = true;
-          play(dumData.sounds.point, 0.5, false);
+          play(String(c.gameCtx.sounds.point), 0.5, false);
         }
         const bH =
           birdProps.current.w * (birdImages[0].height / birdImages[0].width);
@@ -272,7 +320,7 @@ function Game() {
             flashOp.current = 1;
             bgMusicRef.current?.pause();
 
-            play(dumData.sounds.death, 0.5, false);
+            play(String(c.gameCtx.sounds.death), 0.5, false);
           }
         }
         // context.strokeRect(
@@ -335,9 +383,9 @@ function Game() {
         }
       }
 
-      if (dumData.birdSprite.death) {
+      if (c.gameCtx.birdSprite.death) {
         const deathImage = new Image();
-        deathImage.src = dumData.birdSprite.death;
+        deathImage.src = c.gameCtx.birdSprite.death;
 
         context.drawImage(
           gameOverRef.current ? deathImage : birdImages[currentFrame],
@@ -519,7 +567,7 @@ function Game() {
         isTop: true,
       };
       pipe.pArray.push(tPipe);
-      const pipSize = dumData.pipeSprite.distance;
+      const pipSize = c.gameCtx.pipeSprite.distance;
       const bPipe: pipe = {
         image: botPipe,
         x: pipe.x,
@@ -537,7 +585,7 @@ function Game() {
     };
 
     const jump = (k: boolean) => {
-      play(dumData.sounds.flap, 0.5, false);
+      play(String(c.gameCtx.sounds.flap), 0.5, false);
       if (k) {
         physics.current.velocityY = -3.2;
         return;
@@ -557,8 +605,9 @@ function Game() {
               startTime.current = Date.now();
 
               if (!bgMusicRef.current) {
-                bgMusicRef.current = new Audio(dumData.sounds.flap);
-                bgMusicRef.current.volume = dumData.sounds.bgMusic.volume / 100;
+                bgMusicRef.current = new Audio(c.gameCtx.sounds.flap);
+                bgMusicRef.current.volume =
+                  c.gameCtx.sounds.bgMusic.volume / 100;
                 bgMusicRef.current.loop = true;
               }
 
@@ -612,8 +661,8 @@ function Game() {
             startTime.current = Date.now();
 
             if (!bgMusicRef.current) {
-              bgMusicRef.current = new Audio(dumData.sounds.flap);
-              bgMusicRef.current.volume = dumData.sounds.bgMusic.volume / 100;
+              bgMusicRef.current = new Audio(c.gameCtx.sounds.flap);
+              bgMusicRef.current.volume = c.gameCtx.sounds.bgMusic.volume / 100;
               bgMusicRef.current.loop = true;
             }
 
@@ -624,8 +673,8 @@ function Game() {
           if (e.type === "mousedown" || e.type === "touchstart") jump(true);
           if (e.type === "touchend") {
             if (!bgMusicRef.current) {
-              bgMusicRef.current = new Audio(dumData.sounds.flap);
-              bgMusicRef.current.volume = dumData.sounds.bgMusic.volume / 100;
+              bgMusicRef.current = new Audio(c.gameCtx.sounds.flap);
+              bgMusicRef.current.volume = c.gameCtx.sounds.bgMusic.volume / 100;
               bgMusicRef.current.loop = true;
             }
             if (bgMusicRef.current.paused) {
@@ -669,20 +718,65 @@ function Game() {
       bgMusicRef.current?.pause();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [showDialog]);
 
   return (
     <div className="w-screen h-svh flex justify-center flex-col items-center bg-[#4DC0CA]">
       <div className="w-full h-full max-h-200 bg-[#4DC0CA] sm:w-150 sm:h-200  sm:border-4 ">
-        <canvas
-          ref={canRef}
-          style={{
-            backgroundImage: `url(${dumData.bg.bgImg.sprite})`,
-            backgroundPosition: "bottom",
-          }}
-          className="w-full h-full bg-contain bg-repeat-x"
-        ></canvas>
+        {!showDialog && (
+          <canvas
+            ref={canRef}
+            style={{
+              backgroundImage: `url(${c.gameCtx.bg.bgImg.sprite})`,
+              backgroundPosition: "bottom",
+            }}
+            className="w-full h-full bg-contain bg-repeat-x"
+          ></canvas>
+        )}
+        <input className="hidden" ref={inputRef} type="file" />
       </div>
+      {showDialog && (
+        <div className="w-svw h-svh bg-black/80 absolute flex justify-center items-center">
+          <div className="bg-black text-white font-jersey text-4xl flex flex-col gap-5 justify-center items-center border-white border-3 sm:w-200 w-full h-1/2 shadow-[0_0_0_3px_black]">
+            <p>Select a .flap file</p>
+            <div
+              {...getRootProps()}
+              style={{
+                scale: isDragActive ? 1.1 : 1,
+                border: "solid 3px rgba(255,255,255,0.15)",
+                borderRadius: "0rem",
+                color: "rgba(255,255,255,0.8)",
+                background: "#090E13",
+              }}
+              className="w-full p-2 active:p-1 h-1/2"
+            >
+              <input {...getInputProps()} />
+              <div
+                style={{
+                  background: "rgba(0,0,0,0.1)",
+                  transition: "all 300ms",
+                  display: "flex",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+                className="w-full flex-col gap-4 h-full justify-center items-center  overflow-hidden "
+              >
+                {isDragActive ? (
+                  <>
+                    <p>Drop the flap file here ...</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-center">
+                      Drop the flap file here,
+                      <br /> or click to upload
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="sm:hidden h-full max-h-[calc(100%-50rem)] w-full bg-[#DED895]"></div>
     </div>
   );
