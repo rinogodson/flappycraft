@@ -439,30 +439,39 @@ function Game() {
         context.strokeText(
           score.current.toString().padStart(2, "0"),
           canvas.width / 2,
-          gameOverRef.current ? 200 : 150,
+          gameOverRef.current ? 180 : 150,
         );
 
         context.fillStyle = "black";
         context.fillText(
           score.current.toString().padStart(2, "0"),
           canvas.width / 2 + 5,
-          gameOverRef.current ? 200 + 3 : 150 + 3,
+          gameOverRef.current ? 180 + 3 : 150 + 3,
         );
         context.strokeText(
           score.current.toString().padStart(2, "0"),
           canvas.width / 2 + 3,
-          gameOverRef.current ? 200 + 3 : 150 + 3,
+          gameOverRef.current ? 180 + 3 : 150 + 3,
         );
         context.fillStyle = "white";
         context.fillText(
           score.current.toString().padStart(2, "0"),
           canvas.width / 2,
-          gameOverRef.current ? 200 : 150,
+          gameOverRef.current ? 180 : 150,
         );
         if (gameOverRef.current) {
           context.font = '80px "Jersey 10"';
-          context.strokeText("GAME OVER", canvas.width / 2, 280);
-          context.fillText("GAME OVER", canvas.width / 2, 280);
+          context.strokeText("GAME OVER", canvas.width / 2, 450);
+          context.fillText("GAME OVER", canvas.width / 2, 450);
+        }
+        if (gameOverRef.current) {
+          context.drawImage(
+            birdImages[0],
+            canvas.width / 2 - (bW * 1.8) / 2,
+            220,
+            bW * 1.8,
+            bH * 1.8,
+          );
         }
       } else if (!gameStarted.current) {
         const pos = 150;
