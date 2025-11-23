@@ -31,8 +31,8 @@ function Game() {
   }
 
   useEffect(() => {
-    document.body.style.backgroundColor = "#DED895";
-    setThemeColor("#4DC0CA");
+    document.body.style.backgroundColor = dumData.bg.baseColor;
+    setThemeColor(dumData.bg.bgColor);
     return () => {
       document.body.style.backgroundColor = "";
     };
@@ -94,6 +94,7 @@ function Game() {
     const PIPE_SPACING = 300;
     const TERMINAL_VELOCITY = 5;
     const canvas = canRef.current;
+
     if (!canvas) return;
     const context = canRef.current?.getContext("2d");
 
@@ -141,6 +142,8 @@ function Game() {
 
     const update = (time: number) => {
       requestAnimationFrame(update);
+      const delta = (time - lastTime) / 16.666;
+      lastTime = time;
       context.lineWidth = 1;
       context.strokeStyle = "red";
       const floorCollision =
@@ -174,8 +177,6 @@ function Game() {
         flashOp.current -= 0.05;
       }
 
-      const delta = (time - lastTime) / 16.666;
-
       if (!gameStarted.current) {
         birdProps.current.y = canvas.height / 2 + Math.sin(time / 200) * 10;
         birdProps.current.rotation = 0;
@@ -202,12 +203,18 @@ function Game() {
           0,
         );
       }
-      lastTime = time;
 
       if (birdProps.current.y > BASE_TOP_COORDS) {
         birdProps.current.y = BASE_TOP_COORDS;
       }
       context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = `rgba(0,0,0,${dumData.bg.opacity})`;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.font = `25px "Jersey 10"`;
+      context.textAlign = "left";
+      context.textBaseline = "top";
+      context.fillStyle = "white";
+      context.fillText(dumData.name, 10, 10);
 
       const pipeArray = pipeProps.current.pArray;
 
@@ -370,6 +377,8 @@ function Game() {
         BASE_HEIGHT,
       );
 
+      context.textAlign = "center";
+      context.textBaseline = "bottom";
       //THE SCORE DISPLAY!! <-- This is not AI made comment, it's by me Rino Godson! and this entore code is made by me
       context.lineJoin = "miter";
 
@@ -410,11 +419,13 @@ function Game() {
       } else if (!gameStarted.current) {
         const pos = 150;
         const shift = 0;
+        context.textAlign = "center";
 
         context.font = '80px "Jersey 10"';
         context.fillStyle = "black";
 
         context.lineWidth = 7;
+        context.textBaseline = "top";
         context.strokeStyle = "black";
         context.strokeText("Get Ready!", canvas.width / 2 + 3, pos + shift + 3);
 
@@ -508,10 +519,14 @@ function Game() {
         isTop: true,
       };
       pipe.pArray.push(tPipe);
+      const pipSize = dumData.pipeSprite.distance;
       const bPipe: pipe = {
         image: botPipe,
         x: pipe.x,
-        y: randomY + pipe.h + canvas.height / 5,
+        y:
+          randomY +
+          pipe.h +
+          canvas.height / (pipSize == 1 ? 5 : pipSize == 2 ? 4 : 3),
         width: (pipe.h * 3.5) / 21,
         height: pipe.h,
         passed: false,
