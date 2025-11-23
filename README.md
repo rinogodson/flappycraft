@@ -10,7 +10,7 @@ Stack: ReactJS, TailwindCSS
 ```json
 {
   "birdSprite": {
-    "normal": [
+    "normal": [ // for animation, this is the array of frames (max. 3 items)
       "<data_uri>", // image
       "<data_uri>", // image
       "<data_uri>"  // image
