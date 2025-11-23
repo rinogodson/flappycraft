@@ -5,8 +5,15 @@ Stack: ReactJS, TailwindCSS
 ### Framework to create your own version of Flappy Bird
 #### This README was made using [READMEwizard](https://readme-wizard-three.vercel.app) (it's an app made by me :) [Check it out!](https://github.com/rinogodson/readme-wizard))
 
+## Got no files to upload? Try These:
+Save the files using `ctrl/cmd + s` and use them.
+- **[Flappeagen](https://raw.githubusercontent.com/rinogodson/flappycraft/refs/heads/main/demofiles/flappeagen.flap) - Prime's a bird. He tries to avoid VSCode... Help him.**
+- **[ZachTheBird](https://raw.githubusercontent.com/rinogodson/flappycraft/refs/heads/main/demofiles/zachthebird.flap) - Let's remember the issues with the Slack team... (We were at their gunpoint)**
+- **[MuskyBird](https://raw.githubusercontent.com/rinogodson/flappycraft/refs/heads/main/demofiles/muskybird.flap) - Richest bird!!**
+
+
 ## Usage:
-### You can create your own flappy bird by creating a JSON file with this schema and then uploading to the app.
+### You can create your own Flappy Bird by creating a JSON file with this schema and then uploading it to the app.
 ```json
 {
   "birdSprite": {
@@ -20,7 +27,7 @@ Stack: ReactJS, TailwindCSS
   "pipeSprite": {
     "sprite": "<data_uri>", // image
     "fillType": "Stretch",
-    "distance": 1 // can be 1 or 2 or 3 and nothing else
+    "distance": 1 // can be 1, 2, or 3 and nothing else
   },
   "bg": {
     "opacity": 0.1, // range 0.1 to 1, Background Opacity
